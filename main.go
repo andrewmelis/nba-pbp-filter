@@ -32,13 +32,15 @@ func filterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Printf("==============\npbp before:\n%+v\n", pbp)
-	fmt.Printf("==============\ngs before:\n%+v\n", gs)
-
 	gs.FilterNewPlays(&pbp)
 
-	fmt.Printf("==============\ngs after:\n%+v\n", gs)
-	fmt.Printf("==============\npbp after:\n%+v\n", pbp)
+	var msg string
+	if len(pbp.Plays) > 0 {
+		msg = "new plays"
+	} else {
+		msg = "no new plays"
+	}
+	log.Printf("%s: %+v\n", msg, pbp)
 
 	enc := json.NewEncoder(w)
 	err := enc.Encode(&pbp)
