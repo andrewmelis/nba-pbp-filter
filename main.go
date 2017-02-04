@@ -83,6 +83,7 @@ type Game struct {
 	VisitingTeam Team      `json:"vTeam"`
 	HomeTeam     Team      `json:"hTeam"`
 	Period       Period    `json:"period"`
+	Active       bool      `json:"isGameActivated"`
 }
 
 func (g Game) GameCode() string {
