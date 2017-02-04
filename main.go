@@ -28,7 +28,10 @@ func filterHandler(w http.ResponseWriter, r *http.Request) {
 
 		err := dec.Decode(&pbp)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("error decoding game: %s\n", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintln(w, `{"error":"server error occurred"}`)
+			return
 		}
 	}
 
