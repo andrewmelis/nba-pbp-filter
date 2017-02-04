@@ -58,20 +58,23 @@ func filterHandler(w http.ResponseWriter, r *http.Request) {
 
 type GameStates map[string]PlayByPlayGame
 
-// FilterNewPlays updates the cache holding all "done" plays
+// FilterNewPlays updates the cache holding all "done" plays (for now, in current quarter)
 // and updates the input game to only hold "new" plays
 func (s GameStates) FilterNewPlays(pbp *PlayByPlayGame) {
 	// for now, just compare lengths
 	cachedGame := s[pbp.GameCode()]
-	donePlays := cachedGame.Plays
+	var newPlays []Play
+	if cachedGame.Game.Period.Current == pbp.Game.Period.Current {
+		donePlays := cachedGame.Plays
+		newPlays = pbp.Plays[len(donePlays):]
+	} else if cachedGame.Game.Period.Current < pbp.Game.Period.Current {
+		newPlays = pbp.Plays
+	}
 
-	newPlays := pbp.Plays[len(donePlays):] // careful about index here
+	// update cache to only hold current q data -- avoid adding quarter to a Play
+	s[pbp.GameCode()] = *pbp
 
-	// update cache
-	cachedGame.Plays = pbp.Plays
-	s[pbp.GameCode()] = cachedGame
-
-	// swap current game
+	// keep only new plays
 	pbp.Plays = newPlays
 }
 
